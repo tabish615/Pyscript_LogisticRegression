@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Python in HTML</title>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.js"></script>
+  <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.2.js"></script>
+  <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
+  <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/@holoviz/panel@0.13.0/dist/panel.min.js"></script>
+  <script type="text/javascript">
+    Bokeh.set_log_level("info");
+  </script>
+
+  <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+  <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+  <py-env>
+    - matplotlib
+    - seaborn
+    - pandas
+    - numpy
+    - panel==0.13.1a2
+    - statsmodels
+  </py-env>
+  <!-- - paths:
+    - ./myfile.csv -->
+</head>
+<body>
+
+  <h1>Logistic Regression</h1>
+  <div id="fileinput"></div>
+  <div id="upload"></div>
+
+  <div id="op"></div>
+  <py-script>
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+import asyncio
+import panel as pn
+from panel.io.pyodide import show
+
+fileInput = pn.widgets.FileInput(accept=".csv")
+uploadButton = pn.widgets.Button(name="Show Graph", button_type = 'primary')
+
+def process_file(event):
+  if fileInput.value is not None:
+    data = pd.read_csv(io.BytesIO(fileInput.value))
+    x = data['balance']
+    y = data['default']
+    sns.regplot(x=x, y=y, data=data, logistic=True, ci=None, scatter_kws={'color': 'black'}, line_kws={'color': 'red'})
+    op = Element('op')
+    op.write(plt)
+
+await show(fileInput, 'fileinput')
+await show(uploadButton, 'upload')
+
+    
+uploadButton.on_click(process_file)
+
+
+</py-script>
+</body>
+</html>
