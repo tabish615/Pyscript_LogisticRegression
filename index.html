@@ -33,7 +33,8 @@
   <h1>Logistic Regression</h1>
   <div id="fileinput"></div>
   <div id="upload"></div>
-
+  <div id="showTable"></div>
+  <div id="table"></div>
   <div id="op"></div>
   <py-script>
 import matplotlib.pyplot as plt
@@ -45,6 +46,17 @@ from panel.io.pyodide import show
 
 fileInput = pn.widgets.FileInput(accept=".csv")
 uploadButton = pn.widgets.Button(name="Show Graph", button_type = 'primary')
+showTableButton = pn.widgets.Button(name="Show Table", button_type = 'primary')
+
+table = pn.widgets.Tabulator(pagination='remote', page_size=10)
+
+document.getElementById('table').style.display = 'none'
+
+def process_table(event):
+  if fileInput.value is not None:
+    table.value = pd.read_csv(io.BytesIO(fileInput.value))
+    document.getElementById('table').style.display = 'block'
+
 
 def process_file(event):
   if fileInput.value is not None:
@@ -57,9 +69,13 @@ def process_file(event):
 
 await show(fileInput, 'fileinput')
 await show(uploadButton, 'upload')
+await show(table, 'table')
+await show(showTableButton, 'showTable')
 
     
 uploadButton.on_click(process_file)
+showTableButton.on_click(process_table)
+
 
 
 </py-script>
